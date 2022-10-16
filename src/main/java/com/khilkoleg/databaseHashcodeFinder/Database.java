@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.*;
 import java.io.*;
 
@@ -13,81 +14,80 @@ import java.io.*;
  */
 
 public class Database {
+    private static final String TIME_STAMP = new SimpleDateFormat("ddMMyy").format(Calendar.getInstance().getTime());
+    private static final File FILE = Path.of("src/main/resources/database_" + TIME_STAMP + ".json").toFile();
+    private Map<String, String> hashCodedPhoneNumbers;
+    private static Properties properties;
+    private static final int HEADER = 1;
+    private List<String> phoneNumbers;
 
-    String timeStamp = new SimpleDateFormat("ddMMyy").format(Calendar.getInstance().getTime());
-    Map<String, String> hashMap = new HashMap<>();
-
-    public String[] create(int amount) {
-        Random random = new Random();
-        long[] phoneNumbers = new long[amount];
-        String[] strPhoneNumbers = new String[amount];
-        long minPhoneNumber = 7_900_000_00_00L;
-        long maxPhoneNumber = 7_999_999_99_99L;
-        for (int i = 0; i < amount; i++) {
-            phoneNumbers[i] = minPhoneNumber + ((long) (random.nextDouble() * (maxPhoneNumber - minPhoneNumber)));
-            String strPhoneNumber = Long.toString(phoneNumbers[i]);
-            strPhoneNumbers[i] = strPhoneNumber;
-        }
-        return strPhoneNumbers;
+    public Database(int amount) {
+        phoneNumbers = getPhoneNumbers(amount);
+        hashCodedPhoneNumbers = getHashed();
+        properties = new Properties();
     }
 
-    public Map<String, String> hash(String[] strPhoneNumbers) {
-        Map<String, String> hashMap = new HashMap<>(strPhoneNumbers.length);
-        byte[] hashOfPhoneNumbers;
-        for (String strPhoneNumber : strPhoneNumbers) {
-            hashOfPhoneNumbers = strPhoneNumber.getBytes(StandardCharsets.UTF_8);
+    private List<String> getPhoneNumbers(int amount) {
+        var random = new Random();
+        long minPhoneNumber = 7_900_000_00_00L;
+        long maxPhoneNumber = 7_999_999_99_99L;
+        phoneNumbers = new ArrayList<>(HEADER + amount);
+
+        for (int i = 0; i < amount; i++) {
+            phoneNumbers.add(String.valueOf((long) (minPhoneNumber + (random.nextDouble() * (maxPhoneNumber - minPhoneNumber)))));
+            phoneNumbers.set(i, Long.toString(Long.parseLong(phoneNumbers.get(i))));
+        }
+
+        return phoneNumbers;
+    }
+
+    private Map<String, String> getHashed() {
+        hashCodedPhoneNumbers = new HashMap<>(HEADER + phoneNumbers.size());
+
+        for (var phoneNumber : phoneNumbers) {
+            var hashPhoneNumbers = phoneNumber.getBytes(StandardCharsets.UTF_8);
             MessageDigest md = null;
             try {
                 md = MessageDigest.getInstance("SHA256");
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                System.out.println("Данный алгоритм не поддерживается: " + e.getMessage());
             }
-            hashMap.put(strPhoneNumber, String.format("%032x", new BigInteger(1, md.digest(hashOfPhoneNumbers))));
-        }
-        return hashMap;
-    }
-
-    public void save(Map<String, String> hashMap) throws IOException {
-
-        var properties = new Properties();
-        properties.putAll(hashMap);
-        properties.store(new FileOutputStream("src/main/resources/database_" + timeStamp + ".json"), null);
-
-    }
-
-    public Map<String, String> load() throws IOException {
-
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("src/main/resources/database_" + timeStamp + ".json"));
-        for (String key : properties.stringPropertyNames()) {
-            hashMap.put(key, properties.get(key).toString());
+            assert md != null;
+            hashCodedPhoneNumbers.put(phoneNumber, String.format("%032x", new BigInteger(1, md.digest(hashPhoneNumbers))));
         }
 
-        return hashMap;
-
+        return hashCodedPhoneNumbers;
     }
 
-    public String[] createRandomNumbers(int amount) {
-        ArrayList<String> values = new ArrayList<>(hashMap.values());
-        String[] result = new String[amount];
-        for (int i = 0; i < amount; i++) {
-            String randomNumber = values.get(new Random().nextInt(values.size()));
-            result[i] = randomNumber;
+    public void save() {
+        properties.putAll(hashCodedPhoneNumbers);
+        try {
+            properties.store(new FileOutputStream(FILE), null);
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка из метода save: " + e.getMessage());
         }
-        return result;
     }
 
-    public void saveRandomNumbers(String[] result) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/olegkhilko/Desktop/Java/Projects/Database/random_numbers_" + timeStamp + ".json"));
-        for (String s : result) {
-            writer.write(s + "\n");
+    public void load() {
+        try {
+            properties.load(new FileInputStream(FILE));
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка из метода load: " + e.getMessage());
         }
-        writer.close();
+        properties.stringPropertyNames()
+                .forEach(key -> hashCodedPhoneNumbers
+                        .put(key, properties.get(key).toString()));
     }
 
-    public String[] loadRandomNumbers() throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileInputStream("/Users/olegkhilko/Desktop/Java/Projects/Database/random_numbers_" + timeStamp + ".json"));
-        return properties.stringPropertyNames().toArray(new String[0]);
+    public String getTimeStamp() {
+        return TIME_STAMP;
+    }
+
+    public Map<String, String> getHashCodedPhoneNumbers() {
+        return hashCodedPhoneNumbers;
+    }
+
+    public List<String> getPhoneNumbers() {
+        return phoneNumbers;
     }
 }

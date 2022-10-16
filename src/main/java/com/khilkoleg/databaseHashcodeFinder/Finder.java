@@ -6,7 +6,7 @@ import java.util.Map;
  * @author Oleg Khilko
  */
 
-public class Find {
+public class Finder {
 
     public static void phoneNumbers(Map<String, String> hashMap, String[] randomNumbers) {
 
