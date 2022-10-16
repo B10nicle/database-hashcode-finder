@@ -1,10 +1,11 @@
 package com.khilkoleg.databaseHashcodeFinder;
 
-import com.khilkoleg.databaseHashcodeFinder.Database;
-import com.khilkoleg.databaseHashcodeFinder.Find;
-
 import java.io.IOException;
 import java.util.Scanner;
+
+/**
+ * @author Oleg Khilko
+ */
 
 public class Menu {
     public static void main(String[] args) throws IOException {

@@ -1,14 +1,19 @@
 package com.khilkoleg.databaseHashcodeFinder;
 
-import java.io.*;
-import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.math.BigInteger;
 import java.util.*;
+import java.io.*;
+
+/**
+ * @author Oleg Khilko
+ */
 
 public class Database {
+
     String timeStamp = new SimpleDateFormat("ddMMyy").format(Calendar.getInstance().getTime());
     Map<String, String> hashMap = new HashMap<>();
 
@@ -43,18 +48,23 @@ public class Database {
     }
 
     public void save(Map<String, String> hashMap) throws IOException {
-        Properties properties = new Properties();
+
+        var properties = new Properties();
         properties.putAll(hashMap);
-        properties.store(new FileOutputStream("/Users/olegkhilko/Desktop/Java/Projects/Database/database_" + timeStamp + ".json"), null);
+        properties.store(new FileOutputStream("src/main/resources/database_" + timeStamp + ".json"), null);
+
     }
 
     public Map<String, String> load() throws IOException {
+
         Properties properties = new Properties();
-        properties.load(new FileInputStream("/Users/olegkhilko/Desktop/Java/Projects/Database/database_" + timeStamp + ".json"));
+        properties.load(new FileInputStream("src/main/resources/database_" + timeStamp + ".json"));
         for (String key : properties.stringPropertyNames()) {
             hashMap.put(key, properties.get(key).toString());
         }
+
         return hashMap;
+
     }
 
     public String[] createRandomNumbers(int amount) {
