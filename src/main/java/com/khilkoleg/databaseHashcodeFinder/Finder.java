@@ -8,28 +8,23 @@ import java.util.Map;
 
 public class Finder {
 
-    public static void phoneNumbers(Map<String, String> hashMap, String[] randomNumbers) {
-
+    public static void findPhoneNumbers(Database database, RandomPhoneNumbersGenerator generator) {
         var start = System.nanoTime();
 
-        var sortedHashMap = hashMap.entrySet()
+        var sortedHashMap = database.getHashCodedPhoneNumbers()
+                .entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue())
                 .toList();
 
-        for (String eachRandomNumber : randomNumbers) {
-            var finalResult = sortedHashMap.stream()
-                    .filter(n -> eachRandomNumber.equals(n.getValue()))
+        for (var number : generator.getRandomPhoneNumbers()) {
+            sortedHashMap.stream()
+                    .filter(n -> number.equals(n.getValue()))
                     .findAny()
-                    .orElse(null);
-            System.out.println(finalResult);
+                    .ifPresent(System.out::println);
         }
-
         long end = System.nanoTime();
-        long executionTime = (end - start);
-
-        double seconds = (double) executionTime / 1_000_000_000.0;
+        double seconds = (end - start) / 1_000_000_000d;
         System.out.println("\nвремя выполнения поиска: ".toUpperCase() + seconds + " сек");
     }
-
 }

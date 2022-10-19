@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
@@ -14,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Calendar;
+import java.io.File;
 
 /**
  * @author Oleg Khilko
@@ -21,16 +21,16 @@ import java.util.Calendar;
 
 public class DatabaseTests extends Assertions {
     private static final String TIME_STAMP = new SimpleDateFormat("ddMMyy").format(Calendar.getInstance().getTime());
-    private static final File FILE = Path.of("src/main/resources/database_" + TIME_STAMP + ".json").toFile();
+    private static final File FILE = Path.of("src/test/resources/databases/database_" + TIME_STAMP + ".json").toFile();
+    private static final int amount = 10_000;
     private static Properties properties;
     private static Database testDatabase;
     private static Database database;
 
-
     @BeforeEach
     public void initializeDatabases() {
-        testDatabase = new Database(10_000);
-        database = new Database(10_000);
+        testDatabase = new Database(amount);
+        database = new Database(amount);
         properties = new Properties();
     }
 

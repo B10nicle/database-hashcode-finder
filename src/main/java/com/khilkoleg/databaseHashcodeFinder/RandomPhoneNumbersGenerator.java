@@ -11,16 +11,19 @@ import java.io.*;
 
 public class RandomPhoneNumbersGenerator {
     private static final String TIME_STAMP = new SimpleDateFormat("ddMMyy").format(Calendar.getInstance().getTime());
-    private static final File FILE = Path.of("src/main/resources/random_numbers_" + TIME_STAMP + ".json").toFile();
-    private List<String> randomPhoneNumbers;
+    private static final File FILE = Path.of("src/main/resources/random_numbers/random_numbers_" + TIME_STAMP + ".txt").toFile();
+    private final List<String> randomPhoneNumbers;
     private static Properties properties;
+    private final int amount;
 
-    public RandomPhoneNumbersGenerator() {
+    public RandomPhoneNumbersGenerator(int amount, Database database) {
+        randomPhoneNumbers = getRandomHashCodesFromDatabase(amount, database);
         properties = new Properties();
+        this.amount = amount;
     }
 
-    public List<String> createRandomPhoneNumbers(int amount, Map<String, String> hashCodedPhoneNumbers) {
-        var values = new ArrayList<>(hashCodedPhoneNumbers.values());
+    public List<String> getRandomHashCodesFromDatabase(int amount, Database database) {
+        var values = new ArrayList<>(database.getHashCodedPhoneNumbers().values());
         List<String> randomPhoneNumbers = new ArrayList<>(amount);
         values.stream()
                 .limit(amount)
@@ -29,21 +32,31 @@ public class RandomPhoneNumbersGenerator {
         return randomPhoneNumbers;
     }
 
-    public void saveRandomPhoneNumbers(List<String> randomPhoneNumbers) {
+    public void saveRandomHashCodesFromDatabase(List<String> randomPhoneNumbers) {
         try (var bw = new BufferedWriter(new FileWriter(FILE))) {
             for (var line : randomPhoneNumbers)
                 bw.write(line + "\n");
         } catch (IOException e) {
-            throw new RuntimeException("Ошибка из метода saveRandomPhoneNumbers: " + e.getMessage());
+            throw new RuntimeException("Ошибка из метода saveRandomHashCodesFromDatabase() " + e.getMessage());
         }
     }
 
-    private void loadRandomPhoneNumbers() throws IOException {
-        properties.load(new FileInputStream(FILE));
+    public List<String> loadRandomHashCodesFromDatabase() {
+        try {
+            properties.load(new FileInputStream(FILE));
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка из метода loadRandomHashCodesFromDatabase() " + e.getMessage());
+        }
         randomPhoneNumbers.forEach(n -> properties.stringPropertyNames());
+
+        return randomPhoneNumbers;
     }
 
     public List<String> getRandomPhoneNumbers() {
         return randomPhoneNumbers;
+    }
+
+    public int getAmount() {
+        return amount;
     }
 }

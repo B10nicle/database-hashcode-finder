@@ -15,7 +15,7 @@ import java.io.*;
 
 public class Database {
     private static final String TIME_STAMP = new SimpleDateFormat("ddMMyy").format(Calendar.getInstance().getTime());
-    private static final File FILE = Path.of("src/main/resources/database_" + TIME_STAMP + ".json").toFile();
+    private static final File FILE = Path.of("src/main/resources/databases/database_" + TIME_STAMP + ".json").toFile();
     private Map<String, String> hashCodedPhoneNumbers;
     private static Properties properties;
     private static final int HEADER = 1;
@@ -68,7 +68,7 @@ public class Database {
         }
     }
 
-    public void load() {
+    public Map<String, String> load() {
         try {
             properties.load(new FileInputStream(FILE));
         } catch (IOException e) {
@@ -77,6 +77,8 @@ public class Database {
         properties.stringPropertyNames()
                 .forEach(key -> hashCodedPhoneNumbers
                         .put(key, properties.get(key).toString()));
+
+        return hashCodedPhoneNumbers;
     }
 
     public String getTimeStamp() {

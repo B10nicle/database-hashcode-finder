@@ -1,7 +1,5 @@
 package com.khilkoleg.databaseHashcodeFinder;
 
-import com.khilkoleg.databaseHashcodeFinder.exceptions.*;
-
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +11,7 @@ import java.util.Scanner;
 
 public class Settings {
     private Database database;
+    private RandomPhoneNumbersGenerator generator;
 
     public void mainMenu() {
         var input = new Scanner(System.in);
@@ -24,41 +23,23 @@ public class Settings {
                 case "1" -> {
                     System.out.print("\nформат базы данных: ключ-значение\nвведите размер базы данных: ".toUpperCase());
                     amount = input.nextInt();
-/*                    try {
-                        database = new Database(amount);
-                        var hashCodedPhoneNumbers = database.hash();
-                        database.save(hashCodedPhoneNumbers);
-                        System.out.println("\nгенерация базы данных успешно завершена".toUpperCase());
-                        userChoice = printMainMenu();
-                    } catch (IOException e) {
-                        throw new MenuException("Ошибка при сохранении: " + e.getMessage());
-                    }*/
+                    database = new Database(amount);
+                    database.save();
+                    System.out.println("\nгенерация базы данных успешно завершена".toUpperCase());
+                    userChoice = printMainMenu();
                 }
                 case "2" -> {
-/*                    try {
-                        database.load();
-                        System.out.print("\nгенерация случайных значений из базы данных\nвведите количество: ".toUpperCase());
-                        amount = input.nextInt();
-                    } catch (IOException e) {
-                        throw new MenuException("Ошибка при загрузки: " + e.getMessage());
-                    }
-                    try {
-                        database.saveRandomNumbers(database.createRandomNumbers(amount));
-                        database.loadRandomNumbers();
-                        System.out.println("\nгенерация случайных значений успешно завершена".toUpperCase());
-                        userChoice = printMainMenu();
-                    } catch (IOException e) {
-                        throw new MenuException("Ошибка при загрузки и сохранении случайных чисел: " + e.getMessage());
-                    }*/
+                    System.out.print("\nгенерация случайных значений из базы данных\nвведите количество: ".toUpperCase());
+                    amount = input.nextInt();
+                    generator = new RandomPhoneNumbersGenerator(amount, database);
+                    generator.saveRandomHashCodesFromDatabase(generator.getRandomPhoneNumbers());
+                    System.out.println("\nгенерация случайных значений успешно завершена".toUpperCase());
+                    userChoice = printMainMenu();
                 }
                 case "3" -> {
-/*                    try {
-                        System.out.println("\nвыполняется поиск...\n".toUpperCase());
-                        Finder.phoneNumbers(database.load(), database.loadRandomNumbers());
-                        userChoice = printMainMenu();
-                    } catch (IOException e) {
-                        throw new MenuException("Ошибка при поиске: " + e.getMessage());
-                    }*/
+                    System.out.println("\nвыполняется поиск...\n".toUpperCase());
+                    Finder.findPhoneNumbers(database, generator);
+                    userChoice = printMainMenu();
                 }
                 case "4" -> System.exit(0);
 
@@ -81,9 +62,10 @@ public class Settings {
                     3 - поиск по базе данных
                     4 - выход
                     """).toUpperCase());
+
             choice = br.readLine();
         } catch (IOException e) {
-            throw new MenuException("В меню произошла ошибка: " + e.getMessage());
+            throw new RuntimeException("В меню произошла ошибка: " + e.getMessage());
         }
 
         return choice;
