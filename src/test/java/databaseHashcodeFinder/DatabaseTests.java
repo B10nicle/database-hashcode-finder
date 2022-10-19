@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.text.SimpleDateFormat;
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.util.Properties;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,22 +53,9 @@ public class DatabaseTests extends Assertions {
     @Test
     public void databaseSaveTest() throws IOException {
         properties.putAll(database.getHashCodedPhoneNumbers());
-
         properties.store(new FileOutputStream(FILE), null);
 
         assertTrue(Files.exists(FILE.toPath()));
-    }
-
-    @Test
-    public void databaseLoadTest() throws IOException {
-        var newDatabase = new Database(0);
-        properties.load(new FileInputStream(FILE));
-        properties.stringPropertyNames()
-                .forEach(key -> newDatabase.getHashCodedPhoneNumbers()
-                        .put(key, properties.get(key).toString()));
-
-        assertNotNull(newDatabase);
-        assertEquals(10_000, newDatabase.getHashCodedPhoneNumbers().size());
     }
 
 }

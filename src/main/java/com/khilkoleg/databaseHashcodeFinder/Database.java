@@ -68,23 +68,6 @@ public class Database {
         }
     }
 
-    public Map<String, String> load() {
-        try {
-            properties.load(new FileInputStream(FILE));
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка из метода load: " + e.getMessage());
-        }
-        properties.stringPropertyNames()
-                .forEach(key -> hashCodedPhoneNumbers
-                        .put(key, properties.get(key).toString()));
-
-        return hashCodedPhoneNumbers;
-    }
-
-    public String getTimeStamp() {
-        return TIME_STAMP;
-    }
-
     public Map<String, String> getHashCodedPhoneNumbers() {
         return hashCodedPhoneNumbers;
     }

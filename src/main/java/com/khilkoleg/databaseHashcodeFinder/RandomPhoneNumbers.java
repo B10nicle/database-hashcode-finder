@@ -9,16 +9,14 @@ import java.io.*;
  * @author Oleg Khilko
  */
 
-public class RandomPhoneNumbersGenerator {
+public class RandomPhoneNumbers {
     private static final String TIME_STAMP = new SimpleDateFormat("ddMMyy").format(Calendar.getInstance().getTime());
     private static final File FILE = Path.of("src/main/resources/random_numbers/random_numbers_" + TIME_STAMP + ".txt").toFile();
     private final List<String> randomPhoneNumbers;
-    private static Properties properties;
     private final int amount;
 
-    public RandomPhoneNumbersGenerator(int amount, Database database) {
+    public RandomPhoneNumbers(int amount, Database database) {
         randomPhoneNumbers = getRandomHashCodesFromDatabase(amount, database);
-        properties = new Properties();
         this.amount = amount;
     }
 
@@ -32,24 +30,13 @@ public class RandomPhoneNumbersGenerator {
         return randomPhoneNumbers;
     }
 
-    public void saveRandomHashCodesFromDatabase(List<String> randomPhoneNumbers) {
+    public void save(List<String> randomPhoneNumbers) {
         try (var bw = new BufferedWriter(new FileWriter(FILE))) {
             for (var line : randomPhoneNumbers)
                 bw.write(line + "\n");
         } catch (IOException e) {
             throw new RuntimeException("Ошибка из метода saveRandomHashCodesFromDatabase() " + e.getMessage());
         }
-    }
-
-    public List<String> loadRandomHashCodesFromDatabase() {
-        try {
-            properties.load(new FileInputStream(FILE));
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка из метода loadRandomHashCodesFromDatabase() " + e.getMessage());
-        }
-        randomPhoneNumbers.forEach(n -> properties.stringPropertyNames());
-
-        return randomPhoneNumbers;
     }
 
     public List<String> getRandomPhoneNumbers() {

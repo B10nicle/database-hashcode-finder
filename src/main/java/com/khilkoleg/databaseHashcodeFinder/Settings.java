@@ -11,9 +11,9 @@ import java.util.Scanner;
 
 public class Settings {
     private Database database;
-    private RandomPhoneNumbersGenerator generator;
+    private RandomPhoneNumbers numbers;
 
-    public void mainMenu() {
+    private void mainMenu() {
         var input = new Scanner(System.in);
         var userChoice = printMainMenu();
         int amount;
@@ -31,14 +31,14 @@ public class Settings {
                 case "2" -> {
                     System.out.print("\nгенерация случайных значений из базы данных\nвведите количество: ".toUpperCase());
                     amount = input.nextInt();
-                    generator = new RandomPhoneNumbersGenerator(amount, database);
-                    generator.saveRandomHashCodesFromDatabase(generator.getRandomPhoneNumbers());
+                    numbers = new RandomPhoneNumbers(amount, database);
+                    numbers.save(numbers.getRandomPhoneNumbers());
                     System.out.println("\nгенерация случайных значений успешно завершена".toUpperCase());
                     userChoice = printMainMenu();
                 }
                 case "3" -> {
                     System.out.println("\nвыполняется поиск...\n".toUpperCase());
-                    Finder.findPhoneNumbers(database, generator);
+                    Finder.findPhoneNumbers(database, numbers);
                     userChoice = printMainMenu();
                 }
                 case "4" -> System.exit(0);
@@ -54,6 +54,7 @@ public class Settings {
     private static String printMainMenu() {
         var br = new BufferedReader(new InputStreamReader(System.in));
         String choice;
+
         try {
             System.out.println(("""
                                     
@@ -69,5 +70,9 @@ public class Settings {
         }
 
         return choice;
+    }
+
+    public void start() {
+        mainMenu();
     }
 }

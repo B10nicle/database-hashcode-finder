@@ -8,7 +8,6 @@ import com.khilkoleg.databaseHashcodeFinder.Settings;
 
 public class Main {
     public static void main(String[] args) {
-        var settings = new Settings();
-        settings.mainMenu();
+        new Settings().start();
     }
 }

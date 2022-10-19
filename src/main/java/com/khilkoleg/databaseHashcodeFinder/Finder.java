@@ -7,8 +7,7 @@ import java.util.Map;
  */
 
 public class Finder {
-
-    public static void findPhoneNumbers(Database database, RandomPhoneNumbersGenerator generator) {
+    public static void findPhoneNumbers(Database database, RandomPhoneNumbers generator) {
         var start = System.nanoTime();
 
         var sortedHashMap = database.getHashCodedPhoneNumbers()
